@@ -8,8 +8,8 @@ using UnityEngine.Networking;
 using System;
 
 public class DictionaryAPI : MonoBehaviour
-{
-   
+{   
+    [SerializeField] private PlayfabManager playfabManager;
     [SerializeField] private TMP_InputField inputField;
     private string wordEntered="";
     [SerializeField] private CalculateScore calculateScore;
@@ -70,6 +70,9 @@ public class DictionaryAPI : MonoBehaviour
             Debug.Log(jsonResponse);
 
             yourScore.gameObject.SetActive(true);
+
+            playfabManager.SendLeaderboard(calculateScore.score); // send score to leaderboard if word exists
+
 
             // string[] arr = wordEntered.Split('\n');
             

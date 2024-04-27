@@ -8,6 +8,9 @@ using System;
 public class CalculateScore : MonoBehaviour
 {
 
+    // [SerializeField] private PlayfabManager playfabManager; // for leaderboard
+    [HideInInspector] public int score; //to be sent to leaderboard in DictionaryAPI.cs script when word actually exists
+    // and update score 
     [SerializeField] private TMP_Text[] tMP_Texts;
     [SerializeField] private GameObject[] enterBoxes;
     private GameObject enterBoxesParent;
@@ -19,16 +22,17 @@ public class CalculateScore : MonoBehaviour
     private TMP_Text[] tMP_Texts_Insert;// array for insert boxes in tMP_Texts_Boxes
     private TMP_Text[] tMP_Texts_Weights; //array for weight boxes in tMP_Texts_Boxes
     [HideInInspector] public int maxWordsForSubmit=0; // the maximum amount of words expected before sending API request
-    public List<string> wordsEntered= new List<string>();// this list holds the current words that have been
+    [HideInInspector] public List<string> wordsEntered= new List<string>();// this list holds the current words that have been
     // entered by the player. used in Update function
 
     string[] arr8; // array that holds zip of all the letters with their weights
     int[] arr9;  //array for the weights of the insert boxes
+    [SerializeField] private Audio audioS;
     void Start(){
 
         //randomly picking the insert boxes. whether they're 5 or 8 ...
         System.Random rand = new System.Random();
-        enterBoxesParent = enterBoxes[rand.Next(0, enterBoxes.Length+1)];
+        enterBoxesParent = enterBoxes[rand.Next(0, enterBoxes.Length)];
         enterBoxesParent.SetActive(true);
 
         tMP_Texts_Boxes = enterBoxesParent.transform.GetComponentsInChildren<TMP_Text>(); 
@@ -138,7 +142,7 @@ public class CalculateScore : MonoBehaviour
                 continue;
             }
             else{
-                arr9[x] = random.Next(2,9);
+                arr9[x] = random.Next(2,10);
                 assignWeightForInsertBox++;
             }
         }
@@ -200,6 +204,9 @@ public class CalculateScore : MonoBehaviour
                     // not be a item in that int
                     
                     currentBoxImage++;
+
+                    // playing audio 
+                    audioS.Play();
                 }
                 // Debug.Log("Letter " + letter + " pressed.");
                 // Do whatever you want when the letter is pressed
@@ -232,7 +239,7 @@ public class CalculateScore : MonoBehaviour
 
     public void CalculateForWordsEntered(){
 
-        int score = 0;
+        score = 0;
 
         // the visuals of the calculation of the score
         string toPrintOut = "";
@@ -302,7 +309,9 @@ public class CalculateScore : MonoBehaviour
         }
 
         // Debug.Log($"Your score \n {toPrintOut} = {score}");
-        yourScore.text = $"Your score \n {toPrintOut} = {score}"; // visually showing the score to players
+        yourScore.text = $"Your score: \n {toPrintOut} = {score}"; // visually showing the score to players
+
+        // send score to leaderboard
 
         // for(int y=0;y<wordsEnteredWeights.Length;y++){
         //     Debug.Log(wordsEnteredWeights[y]);
