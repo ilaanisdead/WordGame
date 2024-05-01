@@ -34,8 +34,8 @@ public class GameManager : MonoBehaviour
     // give time for animations to play during loading scenes
     IEnumerator LoadMainGame(){
 
-        // yield return new WaitForSeconds(timeForLoading);
-        yield return SceneManager.LoadSceneAsync(1);
+        yield return new WaitForSeconds(timeForLoading);
+        SceneManager.LoadSceneAsync(1);
     }
     IEnumerator LoadMainMenu(){
 

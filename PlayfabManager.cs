@@ -38,10 +38,30 @@ public class PlayfabManager : MonoBehaviour
         
         if(result.InfoResultPayload.PlayerProfile!=null){
             name = result.InfoResultPayload.PlayerProfile.DisplayName;
+    
+            if(GameAssets.i.tMP_Texts.Length!=0){
+                GameAssets.i.tMP_Texts[0].text = name; // setting name of player in main menu
+
+            }
         }
         if(name==null){
             nameWindow.SetActive(true);
         }
+
+        PlayFabClientAPI.GetPlayerStatistics(new GetPlayerStatisticsRequest(), statsResult => {
+            foreach (var stat in statsResult.Statistics) {
+                if (stat.StatisticName == "PlatformScore") {
+                    if(GameAssets.i.tMP_Texts.Length!=0){
+                        GameAssets.i.tMP_Texts[1].text = stat.Value.ToString();// setting score for main menu
+
+                    }
+                    // Assuming "Score" is the name of your statistic
+                    // Debug.Log(stat.Value.ToString());
+                    // Do whatever you need to do with the score here
+                }
+            }
+        }, OnError);
+
         // Debug.Log(name);
         // mainmenu.SetActive(true);
     }
@@ -56,6 +76,7 @@ public class PlayfabManager : MonoBehaviour
     void OnDisplayNameUpdate(UpdateUserTitleDisplayNameResult result){
         Debug.Log("Updated display name!");
         nameWindow.SetActive(false);
+        PlayerPrefs.SetString("Name", nameInput.text);// setting the name of the player for main menu 
         // mainmenu.SetActive(true);
 
     }
@@ -69,6 +90,11 @@ public class PlayfabManager : MonoBehaviour
         Debug.Log(error.GenerateErrorReport());
         retryOnline.SetActive(true);
     }
+    // void OnErrorLogin(PlayFabError error){
+    //     Debug.Log("Error while logging in/creating account!");
+    //     Debug.Log(error.GenerateErrorReport());
+    //     retryOnline.SetActive(true);
+    // }
 
     public void SendLeaderboard(int score){
         var request = new UpdatePlayerStatisticsRequest{
@@ -116,5 +142,18 @@ public class PlayfabManager : MonoBehaviour
             
             Debug.Log(item.Position + " "+item.PlayFabId+" "+item.StatValue);
         }    
+    }
+    public void GetPlayerStatistics(){
+        // Get player statistics
+        PlayFabClientAPI.GetPlayerStatistics(new GetPlayerStatisticsRequest(), statsResult => {
+            foreach (var stat in statsResult.Statistics) {
+                if (stat.StatisticName == "Score") {
+                    int score = stat.Value; // Assuming "Score" is the name of your statistic
+                    Debug.Log("Player score: " + score);
+                    // Do whatever you need to do with the score here
+                }
+            }
+        }, OnError);
+    
     }
 }

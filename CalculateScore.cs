@@ -27,12 +27,60 @@ public class CalculateScore : MonoBehaviour
 
     string[] arr8; // array that holds zip of all the letters with their weights
     int[] arr9;  //array for the weights of the insert boxes
-    [SerializeField] private Audio audioS;
+    private AudioManagerMain audioS;
+    [SerializeField] private Modes currentMode; // describes the mode player is playing. eg, normal, inversed
+    private int randomStart=2, randomEnd=10; // these are the random weights that appear on the insert boxes
+    // difference modes have different start and end weights since they are high risk and high reward kind of modes
+
+    private string mode; // string for mode saved in playerprefs
+
+    enum Modes{
+        Normal, NormalNeg, Inversed, InversedNeg
+    }
+
     void Start(){
+
+        // currentMode = PlayerPrefs.GetString("mode", "Normal"); // getting the current set mode or default to Normal
+
+        audioS= GameObject.Find("Audio").GetComponent<AudioManagerMain>();   
+        
+        // checking and retrieving mode in playerprefs
+        if(PlayerPrefs.HasKey("mode")){
+            mode = PlayerPrefs.GetString("mode","Normal"); // retrieve the mode that's in player prefs
+
+        }
+        else{
+            PlayerPrefs.SetString("mode","Normal"); // set the key to normal if it doesn't already exist in playerprefs
+
+        }
+        // PlayerPrefs.SetString("mode","InversedNeg");
+        // mode = PlayerPrefs.GetString("mode","Normal"); // retrieve the mode that's in player prefs
+
+        switch(mode){
+            default:
+                case "Normal": currentMode = Modes.Normal; break;
+                case "NormalNeg": currentMode =Modes.NormalNeg; break;
+                case "Inversed": currentMode =Modes.Inversed; break;
+                case "InversedNeg": currentMode =Modes.InversedNeg; break;
+        }
+
+        // setting the start int for modes. e.g., normal mode, inverted mode
+        int startFrom = 0;// default it to 0 since normal modes boxes start from index 0 in tMP_Texts_weights array
+        switch(currentMode){
+            default:
+                case Modes.Normal: startFrom=0; randomStart=2; randomEnd=10; break; // normal mode begins from 0 in array
+                case Modes.NormalNeg: startFrom=0; randomStart=-8; randomEnd=15; break;// normal mode begins from 5 in array
+                case Modes.Inversed: startFrom=5; randomStart=2; randomEnd=13; break;// normal mode begins from 5 in array
+                case Modes.InversedNeg: startFrom=5; randomStart=-15; randomEnd=21; break;// normal mode begins from 5 in array
+
+        }
+
 
         //randomly picking the insert boxes. whether they're 5 or 8 ...
         System.Random rand = new System.Random();
-        enterBoxesParent = enterBoxes[rand.Next(0, enterBoxes.Length)];
+        // enterBoxesParent = enterBoxes[rand.Next(0, enterBoxes.Length)];
+        enterBoxesParent = enterBoxes[rand.Next(startFrom, startFrom+5)]; // depending on which mode chosen
+
         enterBoxesParent.SetActive(true);
 
         tMP_Texts_Boxes = enterBoxesParent.transform.GetComponentsInChildren<TMP_Text>(); 
@@ -136,13 +184,14 @@ public class CalculateScore : MonoBehaviour
         // making sure that 3 boxes have weights above 1
         while(assignWeightForInsertBox<3){ 
             int x = random.Next(0,tMP_Texts_Weights.Length); // making sure that the same random number is used in if and 
+            
             // else blocks
 
-            if(arr9[x]>1){
+            if(arr9[x]>1||arr9[x]<1){
                 continue;
             }
             else{
-                arr9[x] = random.Next(2,10);
+                arr9[x] = random.Next(randomStart,randomEnd);
                 assignWeightForInsertBox++;
             }
         }
@@ -150,6 +199,7 @@ public class CalculateScore : MonoBehaviour
         //     Debug.Log(arr9[x]);
         // }
 
+        // showing the weights numbers in the game view
         for(int i = 0;i<tMP_Texts_Weights.Length;i++){
             if(arr9[i]==1){ // so that we don't have to show 1 if a letter is carrying 1 weight
                 tMP_Texts_Weights[i].text = "";
@@ -288,7 +338,7 @@ public class CalculateScore : MonoBehaviour
 
         // creating a string of the calculation of the score to print out to the player
         for(int i=0;i<zippedWeightsArray.Length;i++){
-            toPrintOut += zippedWeightsArray[i].Split(" ")[0]+"x"+zippedWeightsArray[i].Split(" ")[0];
+            toPrintOut += zippedWeightsArray[i].Split(" ")[0]+"x"+zippedWeightsArray[i].Split(" ")[1];
             
             if(i==zippedWeightsArray.Length-1){
                 toPrintOut += "";
@@ -323,5 +373,4 @@ public class CalculateScore : MonoBehaviour
         
 
     }
-
 }
