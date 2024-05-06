@@ -8,7 +8,7 @@ public class PrintText : MonoBehaviour
     private TMP_Text tMP_Text;
     private int charIndex;
     private float timer;
-    private float timePerChar = 0.1f;
+    private float timePerChar = 0.03f;
     private string text;
     // private string text = "Kick Buttowski is dominating Widow Maker's Peak";
     private bool invisibleChar=true;

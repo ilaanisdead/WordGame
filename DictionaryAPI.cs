@@ -8,6 +8,7 @@ using UnityEngine.Networking;
 using System;
 using PlayFab.Json;
 
+
 public class DictionaryAPI : MonoBehaviour
 {   
     [SerializeField] private PlayfabManager playfabManager;
@@ -20,6 +21,7 @@ public class DictionaryAPI : MonoBehaviour
 
     void Awake(){
         fillAllBoxes = fillAllBoxesParent.transform.GetChild(0).GetComponent<TMP_Text>(); 
+        
     }
 
     public void Submit(){
@@ -54,7 +56,7 @@ public class DictionaryAPI : MonoBehaviour
         // joining all the string characters in the list to make a word for submitting to API
         string word = String.Join("",calculateScore.wordsEntered);
 
-        // UnityWebRequest dictionaryAPI = UnityWebRequest.Get($"https://api.dictionaryapi.dev/api/v3/entries/en/{word}");
+        // UnityWebRequest dictionaryAPI = UnityWebRequest.Get($"https://api.dictionaryapi.dev/api/v2/entries/en/{word}");
         UnityWebRequest dictionaryAPI = UnityWebRequest.Get($"https://meanings.onrender.com/api/{word}");
 
         yield return dictionaryAPI.SendWebRequest();
@@ -324,6 +326,14 @@ public class DictionaryAPI : MonoBehaviour
 //     public string origin;
 //     public List<Meaning> meanings;
 // }
+
+
+
+
+
+
+
+
 
 public class DictionaryEntryArray
 {
